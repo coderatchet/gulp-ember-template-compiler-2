@@ -1,6 +1,10 @@
 'use strict'
 through = require 'through2'
 {PluginError} = require 'gulp-util'
+nopt = require 'nopt'
+{compile, precompile} = require './lib/ember-template-compiler'
+File = require 'vinyl'
+extend = require 'extend'
 
 createPluginError = (message) ->
     new PluginError 'gulp-ember-template-compiler-2', message
@@ -20,21 +24,18 @@ awesomePlugin = (opt = msg: 'More Coffee!') ->
             @push file
             return done()
 
-        # as long as we do not support streams
-        # we have to let 'em now
         if file.isStream()
-            @emit 'error', createPluginError(
-                'stream content is not supported'
-            )
+            file.on 'data', ->
             return done()
 
         # this is where the magic happens
         input = file.contents.toString()
-        output = "#{input}\n#{opt.msg}"
+        template = precompile(input, false)
+        output = extend file, contents: new Buffer(compile(template))
+        console.log output.contents.toString()
 
         # let's pass the result along
-        file.contents = new Buffer output
-        @push file
+        @push output
         done()
 
 module.exports = awesomePlugin

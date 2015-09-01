@@ -1,8 +1,20 @@
+(->
+    childProcess = require("child_process")
+    oldSpawn = childProcess.spawn
+    mySpawn = ->
+        console.log 'spawn called'
+        console.log arguments
+        oldSpawn.apply this, arguments
+    childProcess.spawn = mySpawn
+)()
+
 # module dependencies
 chai = require 'chai'
 should = chai.should()
+gulp = require 'gulp'
 gutil = require 'gulp-util'
 path = require 'path'
+fs = require 'fs'
 
 # const
 PLUGIN_NAME = 'gulp-ember-template-compiler-2'
@@ -12,7 +24,7 @@ ERRS =
     STREAM:
         'stream content is not supported'
 # SUT
-emberTemplateCompiler2 = require '../'
+etc = require '../'
 
 describe 'gulp-ember-template-compiler-2', ->
     describe 'emberTemplateCompiler2()', ->
@@ -25,7 +37,7 @@ describe 'gulp-ember-template-compiler-2', ->
                 base: './test/fixture/',
                 contents: null
 
-            stream = emberTemplateCompiler2()
+            stream = etc()
 
             stream.on 'data', (newFile) ->
                 should.exist(newFile)
@@ -52,7 +64,7 @@ describe 'gulp-ember-template-compiler-2', ->
                 base: './test/fixture/',
                 contents: new Buffer 'sure()'
 
-            stream = emberTemplateCompiler2()
+            stream = etc()
 
             stream.on 'data', (newFile) ->
                 should.exist(newFile)
@@ -61,7 +73,6 @@ describe 'gulp-ember-template-compiler-2', ->
                 should.exist(newFile.contents)
                 newFile.path.should.equal './test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
-                newFile.contents.toString().should.equal 'sure()\nMore Coffee!'
                 ++dataCounter
 
 
@@ -88,7 +99,7 @@ describe 'gulp-ember-template-compiler-2', ->
                 contents: new Buffer 'yeahmetoo()'
 
 
-            stream = emberTemplateCompiler2()
+            stream = etc()
 
             stream.on 'data', (newFile) ->
                 ++dataCounter
@@ -110,15 +121,12 @@ describe 'gulp-ember-template-compiler-2', ->
                 base: './test/fixture/',
                 contents: new Buffer 'yeah();'
 
-            stream = emberTemplateCompiler2({
+            stream = etc({
                 msg: 'Another something'
             })
 
             stream.on 'data', (newFile) ->
                 ++dataCounter
-                newFile.contents.toString().should.equal(
-                    'yeah();\nAnother something'
-                )
 
             stream.once 'end', ->
                 dataCounter.should.equal 1
@@ -126,33 +134,29 @@ describe 'gulp-ember-template-compiler-2', ->
 
             stream.write fakeFile
             stream.end()
+        it 'should handle streams', (done) ->
+            dataCounter = 0
+
+            fakeFile = new gutil.File
+                path: './test/fixture/file.js',
+                cwd: './test/',
+                base: './test/fixture/',
+                contents: new Buffer 'Hello'
+
+            stream = etc()
+            stream.on 'data', -> ++dataCounter
+            stream.once 'end', -> done()
+            stream.write fakeFile
+            stream.end()
 
         describe 'errors', ->
             describe 'are thrown', ->
                 it 'if configuration is just wrong', (done) ->
                     try
-                        stream = emberTemplateCompiler2({
+                        stream = etc({
                             msg: ->
                         })
                     catch e
                         e.plugin.should.equal PLUGIN_NAME
                         e.message.should.equal ERRS.MSG
                         done()
-
-            describe 'are emitted', ->
-                it 'if file content is stream', (done) ->
-                    fakeFile = new gutil.File
-                        path: './test/fixture/file.js',
-                        cwd: './test/',
-                        base: './test/fixture/',
-                        contents: process.stdin
-
-                    stream = emberTemplateCompiler2()
-
-                    stream.on 'error', (e) ->
-                        e.plugin.should.equal PLUGIN_NAME
-                        e.message.should.equal ERRS.STREAM
-                        done()
-
-                    stream.write fakeFile
-                    stream.end()

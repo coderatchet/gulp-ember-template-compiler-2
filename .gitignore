@@ -4,3 +4,4 @@ temp/
 coverage/
 *.log
 index.js
+test/fixtures/compiled
