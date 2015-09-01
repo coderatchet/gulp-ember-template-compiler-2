@@ -1,0 +1,10 @@
+{
+  "generator-gulpplugin-coffee": {
+    "pluginName": "ember-template-compiler-2",
+    "githubUser": "coderatchet",
+    "appname": "gulp-ember-template-compiler-2",
+    "realname": "Jared",
+    "email": "jared@thenaglecode.com",
+    "homepage": "http://thenaglecode.com"
+  }
+}
