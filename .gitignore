@@ -5,3 +5,4 @@ coverage/
 *.log
 index.js
 test/fixtures/compiled
+bower_components

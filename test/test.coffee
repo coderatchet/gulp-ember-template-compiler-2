@@ -21,8 +21,6 @@ PLUGIN_NAME = 'gulp-ember-template-compiler-2'
 ERRS =
     MSG:
         'msg param needs to be a string, dummy'
-    STREAM:
-        'stream content is not supported'
 # SUT
 etc = require '../'
 
@@ -141,7 +139,7 @@ describe 'gulp-ember-template-compiler-2', ->
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'Hello'
+                contents: fs.createReadStream('./test/fixtures/test.hbs')
 
             stream = etc()
             stream.on 'data', -> ++dataCounter

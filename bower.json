@@ -1,0 +1,25 @@
+{
+  "name": "gulp-ember-template-compiler-2",
+  "version": "0.0.1",
+  "homepage": "https://github.com/coderatchet/gulp-ember-template-compiler-2",
+  "authors": [
+    "Jared Nagle <jared@thenaglecode.com>"
+  ],
+  "description": "compiles ember 2.0 templates",
+  "main": "index.js",
+  "keywords": [
+    "gulpplugin"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "compiled",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "ember-template-compiler": "http://builds.emberjs.com/tags/v2.0.1/ember-template-compiler.js"
+  }
+}
